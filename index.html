@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Dados e Gerenciamento de Conteúdo - Aula 01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0,0, 0.1), 0 2px 4px -1px rgba(0, 0,0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0,0, 0.1), 0 4px 6px -2px rgba(0, 0,0, 0.05);
+            --correct: #10b981;
+            --incorrect: #ef4444;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, var(--bg-color) 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        header > * {
+            position: relative;
+            z-index: 1;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin: 1.5rem 0 1rem;
+        }
+        .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        ul li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+        ul li::before {
+            content: '▸';
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary-color);
+            margin: 1.5rem 0;
+        }
+        .quiz-card {
+            position: sticky;
+            top: 2rem;
+        }
+        .quiz-container h2 {
+            margin-bottom: 1.5rem;
+        }
+        .question {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+        }
+        .question:hover {
+            border-color: var(--secondary-color);
+        }
+        .question-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .question-number {
+            background: var(--secondary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .options label {
+            display: block;
+            margin: 0.5rem 0;
+            padding: 1rem 1.2rem;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .options label:hover {
+            border-color: var(--secondary-color);
+            background: #eff6ff;
+        }
+        .options input:checked + label {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        .options input {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        button {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+            border: none;
+            padding: 1.2rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        #result {
+            margin-top: 2rem;
+            padding: 2rem;
+            text-align: center;
+            font-weight: 700;
+            border-radius: 16px;
+            display: none;
+            font-size: 1.2rem;
+        }
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        .correct-answer {
+            background: #dcfce7;
+            color: var(--correct);
+            border: 1px solid var(--correct);
+        }
+        .wrong-answer {
+            background: #fef2f2;
+            color: var(--incorrect);
+            border: 1px solid var(--incorrect);
+        }
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-light);
+            background: var(--card-bg);
+            margin-top: 3rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-database"></i> Banco de Dados e Gerenciamento de Conteúdo</h1>
+            <p>Aula 01: Hospedagem Web e Sistemas de Gerenciamento de Conteúdo (CMS)</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content-grid">
+            <div class="main-content">
+                <div class="card">
+                    <h2><span class="icon"><i class="fas fa-server"></i></span>1. Hospedagem de Sites na Internet</h2>
+                    <p>A hospedagem web é o serviço essencial que permite que indivíduos e organizações disponibilizem sites ou páginas na Internet. Provedores de hospedagem fornecem as tecnologias e infraestrutura necessárias para que o conteúdo seja acessível globalmente.</p>
+                    
+                    <h3>Modelos Tradicionais de Hospedagem</h3>
+                    <ul>
+                        <li><strong>Hospedagem Compartilhada</strong>: Múltiplos sites compartilham o mesmo servidor físico, tornando-a econômica mas suscetível a variações de desempenho.</li>
+                        <li><strong>VPS (Virtual Private Server)</strong>: Servidor físico particionado em máquinas virtuais isoladas, oferecendo controle e recursos dedicados.</li>
+                        <li><strong>Servidor Dedicado</strong>: Aluguel exclusivo de um servidor físico inteiro, ideal para alta performance e controle total.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>Infraestrutura de Suporte:</strong> O DNS (Domain Name System) traduz domínios em IPs; FTP transfere arquivos; HTTPS garante segurança na comunicação.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><span class="icon"><i class="fas fa-cloud"></i></span>Cloud Computing</h2>
+                    <p>Na nuvem, servidores virtuais interconectados formam uma infraestrutura elástica, diferentemente da hospedagem tradicional fixa.</p>
+                    
+                    <div class="highlight-box">
+                        <strong>Vantagens Principais:</strong><br>
+                        • <strong>Escalabilidade</strong>: Ajuste recursos instantaneamente conforme demanda.<br>
+                        • <strong>Pagamento por Uso</strong>: Cobrança baseada em consumo real (CPU, RAM, tráfego).<br>
+                        • <strong>Provedores</strong>: AWS, Google Cloud, Microsoft Azure, DigitalOcean.
+                    </div>
+
+                    <h3>Escalabilidade Vertical vs Horizontal</h3>
+                    <ul>
+                        <li><strong>Vertical</strong>: Aumentar potência (RAM/CPU) do servidor atual.</li>
+                        <li><strong>Horizontal</strong>: Adicionar mais servidores à rede.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h2><span class="icon"><i class="fas fa-cogs"></i></span>2. Sistemas de Gerenciamento de Conteúdo (CMS)</h2>
+                    <p>CMS é um software que permite criar, editar e gerenciar conteúdo web sem programação avançada, separando <strong>Frontend</strong> (interface visual) do <strong>Backend</strong> (processamento e dados).</p>
+
+                    <h3>Tipos de CMS</h3>
+                    <ul>
+                        <li><strong>Open Source</strong>: Código aberto e gratuito - <em>WordPress</em>, <em>Joomla</em>, <em>Drupal</em>.</li>
+                        <li><strong>SaaS</strong>: Plataformas hospedadas e pagas - <em>Wix</em>, <em>Shopify</em>.</li>
+                        <li><strong>Headless CMS</strong>: Backend via API, sem frontend acoplado.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>Componentes Chave:</strong><br>
+                        • <strong>Templates</strong>: Layouts visuais pré-definidos.<br>
+                        • <strong>Plugins/Extensões</strong>: Funcionalidades adicionais.<br>
+                        • <strong>Customização</strong>: Edição via CSS (estilo) ou painel admin.<br>
+                        • <strong>Banco MySQL</strong>: Armazenamento de dados (ex: wp-config.php no WordPress).
+                    </div>
+
+                    <h3>Instalação Típica</h3>
+                    <ul>
+                        <li>Criação de banco MySQL.</li>
+                        <li>Upload via FTP (FileZilla).</li>
+                        <li>Configuração inicial e escolha de template.</li>
+                        <li>Testes locais com XAMPP/WAMP.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="card">
+                    <h2><span class="icon"><i class="fas fa-graduation-cap"></i></span>Quiz Teórico</h2>
+                    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+                    <div id="quizContent">
+                        <p id="quizIntro">Responda às questões baseadas exclusivamente no conteúdo teórico acima.</p>
+                    </div>
+                    <form id="quizForm"></form>
+                    <div style="display:flex; gap:0.75rem; margin-top:1rem;">
+                        <button type="button" id="btnNext" onclick="nextQuestion()" style="display:none;"><i class="fas fa-arrow-right"></i> Próxima</button>
+                        <button type="button" id="btnFinish" onclick="calculateResult()" style="display:none;"><i class="fas fa-check"></i> Finalizar</button>
+                        <button type="button" id="btnRestart" onclick="restartQuiz()" style="display:none;"><i class="fas fa-redo"></i> Refazer</button>
+                    </div>
+                    <div id="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p><i class="fas fa-book"></i> Material desenvolvido para a disciplina de Banco de Dados e Gerenciamento de Conteúdo - Aula 01</p>
+        </div>
+    </footer>
+
+    <script>
+        const questions = [
+            { q: "Qual a principal característica da Hospedagem Compartilhada?", a: ["Múltiplos sites no mesmo servidor", "Servidor exclusivo", "Sem uso de DNS", "Sempre mais cara"], c: 0 },
+            { q: "O que diferencia um VPS de hospedagem compartilhada?", a: ["Mesma performance", "Sem banco de dados", "Menos custo", "Recursos dedicados e isolamento"], c: 3 },
+            { q: "Qual função do DNS na hospedagem?", a: ["Instalar plugins", "Traduzir domínio em IP", "Armazenar conteúdo", "Editar templates"], c: 1 },
+            { q: "Na nuvem, o pagamento é baseado em:", a: ["Número de visitantes", "Tamanho do template", "Tempo fixo", "Consumo real de recursos"], c: 3 },
+            { q: "Qual exemplo de provedor de nuvem?", a: ["FileZilla", "XAMPP", "AWS", "WordPress"], c: 2 },
+            { q: "Escalabilidade Vertical significa:", a: ["Trocar CMS", "Diminuir custos", "Aumentar RAM/CPU atual", "Adicionar servidores"], c: 2 },
+            { q: "O que é um CMS?", a: ["Protocolo de segurança", "Template visual", "Software para gerenciar conteúdo sem programação avançada", "Servidor de hospedagem"], c: 2 },
+            { q: "Qual CMS open source citado?", a: ["Shopify", "Netlify", "Wix", "WordPress"], c: 3 },
+            { q: "O que caracteriza SaaS CMS?", a: ["Plataforma paga e hospedada", "Sem backend", "Apenas local", "Código aberto"], c: 0 },
+            { q: "Headless CMS entrega conteúdo via:", a: ["DNS", "API", "Templates fixos", "FTP"], c: 1 },
+            { q: "O que são Templates em CMS?", a: ["Arquivos de config", "Plugins de segurança", "Bancos de dados", "Layouts visuais"], c: 3 },
+            { q: "Frontend em CMS é:", a: ["Banco MySQL", "Interface visual do usuário", "Painel admin", "Processamento backend"], c: 1 },
+            { q: "Backend em CMS refere-se a:", a: ["Logotipo", "Cores e fontes", "Navegador", "Funcionalidades e processamento de dados"], c: 3 },
+            { q: "Ferramenta para upload de arquivos:", a: ["FTP (FileZilla)", "API", "MySQL", "CSS"], c: 0 },
+            { q: "Banco comum em CMS como WordPress:", a: ["Oracle", "PostgreSQL apenas", "MySQL", "MongoDB"], c: 2 },
+            { q: "Customização via CSS afeta:", a: ["Hospedagem", "Plugins", "Lógica de dados", "Estilo visual"], c: 3 },
+            { q: "O que são Plugins?", a: ["Servidores", "Domínios", "Extensões de funcionalidades", "Layouts"], c: 2 },
+            { q: "Instalação local usa:", a: ["Sem banco", "XAMPP/WAMP", "AWS apenas", "Internet obrigatória"], c: 1 },
+            { q: "Protocolo seguro para sites:", a: ["CMS", "FTP", "HTTPS", "HTTP"], c: 2 },
+            { q: "Arquivo wp-config.php configura:", a: ["Templates", "Plugins", "Cores", "Conexão com banco de dados"], c: 3 }
+        ];
+
+        let currentQuestion = 0;
+        const totalQuestions = questions.length;
+        const userAnswers = new Array(totalQuestions).fill(null);
+
+        function loadQuestion() {
+            const quizForm = document.getElementById('quizForm');
+            quizForm.innerHTML = '';
+            const q = questions[currentQuestion];
+            const isLast = currentQuestion === totalQuestions - 1;
+
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question';
+            questionDiv.innerHTML = `
+                <div class="question-header">
+                    <div class="question-number">${currentQuestion + 1}</div>
+                    <div>
+                        <strong>${q.q}</strong>
+                    </div>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-light); margin:0.25rem 0 0.75rem 0;">Pergunta ${currentQuestion + 1} de ${totalQuestions}</p>
+                <div class="options">
+                    ${q.a.map((opt, i) => `
+                        <label style="display:flex; align-items:center; gap:0.5rem;">
+                            <input type="radio" name="q_current" value="${i}" ${userAnswers[currentQuestion] === i ? 'checked' : ''} onchange="selectAnswer(${i})"> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+            quizForm.appendChild(questionDiv);
+
+            document.getElementById('progress').style.width = `${((currentQuestion + 1) / totalQuestions) * 100}%`;
+            document.getElementById('btnNext').style.display = (!isLast) ? 'block' : 'none';
+            document.getElementById('btnFinish').style.display = isLast ? 'block' : 'none';
+            document.getElementById('btnRestart').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('quizIntro') && (document.getElementById('quizIntro').style.display = 'none');
+        }
+
+        function selectAnswer(i) {
+            userAnswers[currentQuestion] = i;
+        }
+
+        function nextQuestion() {
+            const selected = document.querySelector('input[name="q_current"]:checked');
+            if (!selected) {
+                alert('Por favor, selecione uma resposta antes de continuar.');
+                return;
+            }
+            userAnswers[currentQuestion] = parseInt(selected.value);
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        function calculateResult() {
+            const selected = document.querySelector('input[name="q_current"]:checked');
+            if (!selected) {
+                alert('Por favor, selecione uma resposta antes de finalizar.');
+                return;
+            }
+            userAnswers[currentQuestion] = parseInt(selected.value);
+
+            let score = 0;
+            questions.forEach((item, index) => {
+                if (userAnswers[index] === item.c) score++;
+            });
+
+            // Show all questions with feedback
+            const quizForm = document.getElementById('quizForm');
+            quizForm.innerHTML = '';
+            questions.forEach((item, index) => {
+                const correct = userAnswers[index] === item.c;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.style.marginBottom = '1rem';
+                questionDiv.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number" style="background:${correct ? 'var(--correct)' : 'var(--incorrect)'}">${index + 1}</div>
+                        <div><strong>${item.q}</strong></div>
+                    </div>
+                    <div class="feedback ${correct ? 'correct-answer' : 'wrong-answer'}" style="display:block; margin-top:0.75rem;">
+                        ${correct
+                            ? '<i class="fas fa-check-circle"></i> Correto!'
+                            : `<i class="fas fa-times-circle"></i> Incorreto. Resposta certa: <strong>${item.a[item.c]}</strong>${userAnswers[index] !== null ? ` · Sua resposta: ${item.a[userAnswers[index]]}` : ''}`
+                        }
+                    </div>
+                `;
+                quizForm.appendChild(questionDiv);
+            });
+
+            document.getElementById('progress').style.width = '100%';
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('btnFinish').style.display = 'none';
+            document.getElementById('btnRestart').style.display = 'block';
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = score >= 12 ? 'correct-answer' : 'wrong-answer';
+            resultDiv.innerHTML = `
+                <i class="fas ${score >= 12 ? 'fa-trophy' : 'fa-redo'}"></i>
+                Você acertou <strong>${score}/${totalQuestions}</strong> questões!
+                ${score >= 12 ? '<br>Parabéns! Excelente compreensão da teoria!' : '<br>Tente novamente focando nos conceitos principais.'}
+            `;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers.fill(null);
+            document.getElementById('result').style.display = 'none';
+            loadQuestion();
+        }
+
+        // Initialize quiz
+        loadQuestion();
+        document.getElementById('btnNext').style.display = 'block';
+    </script>
+</body>
+</html>
